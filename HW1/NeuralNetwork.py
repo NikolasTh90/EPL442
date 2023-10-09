@@ -67,5 +67,10 @@ class NeuralNetwork:
 
     def getMomentum(self):
         return float(self.parameters['momentum'])
+    
+    def __str__(self)
+        return "Neural Network: \n" + \
+            "Parameters: " + str(self.parameters) + "\n" + \
+            "Layers: " + str(self.layers) + "\n"
 
     
