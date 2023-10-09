@@ -2,7 +2,7 @@ import numpy as np
 from .FeedForward import sigmoid
 class Neuron():
     id = 0
-    def __init__(self, isBias=False):
+    def __init__(self, isBias=False, isOutput=False):
         self.id = Neuron.id = Neuron.id + 1
         self.connectedFromNeurons = []
         self.connectedToNeurons = []
@@ -12,6 +12,7 @@ class Neuron():
         self.weights = []
         self.weightsOld = []
         self.isBias = isBias
+        self.isOutput = isOutput
 
 
 
@@ -77,7 +78,22 @@ class Neuron():
         
         return self.output
 
+    def calculateDelta(self, targetOutput = None):
+        if self.isOutput:
+            self.delta = self.output * (1 - self.output) * (self.output - targetOutput)
+        else:
+            self.delta = self.output * (1 - self.output) * sum([next_node.getDelta() * self.weights[i] for i, next_node in enumerate(self.connectedToNeurons)])
 
+        return self.delta
+
+    def updateWeights(self, learningRate, momentum):
+        for i, weight in enumerate(self.weights):
+            weight = weight - learningRate * self.delta * self.output + momentum * (self.weights[i] - self.weightsOld[i])
+            self.weightsOld[i] = self.weights[i]
+            self.weights[i] = weight
+
+
+        
 
 
         

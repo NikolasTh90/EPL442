@@ -38,7 +38,7 @@ class NeuralNetwork:
         # Create the output layer
         outputLayer = []
         for i in range(int(self.parameters["numOutputNeurons"])):
-            outputLayer.append(Neuron())
+            outputLayer.append(Neuron(isOutput=True))
         
         self.layers.append(outputLayer)
 
@@ -60,5 +60,11 @@ class NeuralNetwork:
     
     def getLayers(self):
         return self.layers
+    
+    def getLearningRate(self):
+        return float(self.parameters['learningRate'])
+
+    def getMomentum(self):
+        return float(self.parameters['momentum'])
 
     
