@@ -7,6 +7,14 @@ class PandasFileReader:
 
     def get_parameters(self):
         parameters = self.df.set_index(0).squeeze().to_dict()
+        for key in parameters.keys():
+            try:
+                parameters[key] = int(parameters[key])
+            except:
+                try:
+                    parameters[key] = float(parameters[key])
+                except:
+                    pass
         return parameters
 
     def get_data(self):
@@ -43,6 +51,14 @@ class FileReader:
             if line:
                 line = line.split()
                 parameters[line[0]] = line[1]
+        for key in parameters.keys():
+            try:
+                parameters[key] = int(parameters[key])
+            except:
+                try:
+                    parameters[key] = float(parameters[key])
+                except:
+                    pass
         return parameters
     
     # read the file parameters of this format and load in a parameters dictionary

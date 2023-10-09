@@ -1,5 +1,5 @@
 import numpy as np
-from .FeedForward import sigmoid
+from FeedForward import sigmoid
 class Neuron():
     id = 0
     def __init__(self, isBias=False, isOutput=False):

@@ -1,7 +1,7 @@
 import numpy as np
 import NeuralNetwork
-def sigmoid(sum):
-    return 1.0/(1 + np.exp(-sum))
+def sigmoid(sum, a = 1):
+    return 1.0/(1 + np.exp(-a*sum))
 
 def feedForward(network:NeuralNetwork, dataInputs:dict, patternNum:int):
     for i, layer in enumerate(network.layers):

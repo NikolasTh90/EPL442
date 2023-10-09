@@ -1,8 +1,9 @@
-from . import Neuron
+from Neuron import Neuron
 import numpy as np
 class NeuralNetwork:
     def __init__(self, parameters:dict):
         self.parameters = parameters
+        print(self.parameters)
         self.layers = []
         self.createLayers()
         self.connectLayers()
@@ -44,7 +45,7 @@ class NeuralNetwork:
 
     def connectLayers(self):
         for i, layer in enumerate(self.layers):
-            if i == len(self.layers - 1):
+            if i == len(self.layers) - 1:
                 break
             for node in layer:
                 node.setConnectedToNeurons([next_layer_node for next_layer_node in self.layers[i+1]])
@@ -53,7 +54,7 @@ class NeuralNetwork:
 
     def initializeWeights(self):
         for i, layer in enumerate(self.layers):
-            if i == len(self.layers - 1):
+            if i == len(self.layers) - 1:
                 break
             for node in layer:
                 node.setWeights(np.random.uniform(low=-1, high=1, size=len(self.layers[i+1])))

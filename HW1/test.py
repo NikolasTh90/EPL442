@@ -1,4 +1,4 @@
-import FileReader
-data = FileReader.FileReader('training.txt').getData()
-print(type(data), data)
+import MyFileReader as MyFileReader
+parameters = MyFileReader.FileReader('parameters.txt').getParameters()
+print(type(parameters), parameters)
 
