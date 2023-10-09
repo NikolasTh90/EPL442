@@ -1,13 +1,19 @@
+import numpy as np
+from .FeedForward import sigmoid
 class Neuron():
     id = 0
-    def __init__(self):
+    def __init__(self, isBias=False):
         self.id = Neuron.id = Neuron.id + 1
         self.connectedFromNeurons = []
         self.connectedToNeurons = []
-        self.output = 0
+        self.output = 1
         self.error = 0
         self.delta = 0
         self.weights = []
+        self.weightsOld = []
+        self.isBias = isBias
+
+
 
     def addConnectedFromNeuron(self, neuron):
         self.connectedFromNeurons.append(neuron)
@@ -56,3 +62,22 @@ class Neuron():
             "Error: " + str(self.error) + "\n" + \
             "Delta: " + str(self.delta) + "\n" + \
             "Weights: " + str(self.weights) + "\n"
+
+
+    def calculateOutput(self):
+        if self.isBias:
+            self.output = 1
+        else:
+            inputs = np.array()
+            for prev_node in self.connectedFromNeurons:
+                indexOfself = prev_node.connectedToNeurons.index(self)
+                inputs.append(prev_node.getWeights()[indexOfself]*prev_node.getOutput())
+            
+            self.output = sigmoid(inputs.sum())
+        
+        return self.output
+
+
+
+
+        

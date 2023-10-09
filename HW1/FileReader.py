@@ -49,7 +49,8 @@ class FileReader:
     # input1 input2 output
     # 0 0 0
     # 0 1 1
-    def getData(self, lines):
+    def getData(self):
+        lines = self.lines
         data = {}
 
         # Extract keys from the first line
@@ -61,7 +62,7 @@ class FileReader:
         for i in range(1, len(lines)):
             values = lines[i].split()
             
-            for value, col in values, range(0, len(values)):
+            for col, value in enumerate(values):
                 # Assign values to their respective keys
                 data[keys[col]].append(value)
 
