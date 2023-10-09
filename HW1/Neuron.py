@@ -1,0 +1,58 @@
+class Neuron():
+    id = 0
+    def __init__(self):
+        self.id = Neuron.id = Neuron.id + 1
+        self.connectedFromNeurons = []
+        self.connectedToNeurons = []
+        self.output = 0
+        self.error = 0
+        self.delta = 0
+        self.weights = []
+
+    def addConnectedFromNeuron(self, neuron):
+        self.connectedFromNeurons.append(neuron)
+    
+    def addConnectedToNeuron(self, neuron):
+        self.connectedToNeurons.append(neuron)
+    
+    def setConnectedToNeurons(self, neurons:list):
+        self.connectedToNeurons = neurons
+    
+    def setOutput(self, output):
+        self.output = output
+        
+    def getOutput(self):
+        return self.output
+    
+    def setError(self, error):
+        self.error = error
+    
+    def getError(self):
+        return self.error
+    
+    def setDelta(self, delta):
+        self.delta = delta
+    
+    def getDelta(self):
+        return self.delta
+    
+    def setWeights(self, weights):
+        self.weights = weights
+    
+    def getWeights(self):
+        return self.weights
+    
+    def getConnectedFromNeurons(self):
+        return self.connectedFromNeurons
+    
+    def getConnectedToNeurons(self):
+        return self.connectedToNeurons
+    
+    def __str__(self):
+        return "Neuron: " + str(self.id) + "\n" + \
+            "Connected From Neurons: " + str([neuron.id for neuron in self.connectedFromNeurons]) + "\n" + \
+            "Connected To Neurons: " + str([neuron.id for neuron in self.connectedToNeurons]) + "\n" + \
+            "Output: " + str(self.output) + "\n" + \
+            "Error: " + str(self.error) + "\n" + \
+            "Delta: " + str(self.delta) + "\n" + \
+            "Weights: " + str(self.weights) + "\n"
