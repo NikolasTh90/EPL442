@@ -1,9 +1,9 @@
 from Neuron import Neuron
+import copy
 import numpy as np
 class NeuralNetwork:
     def __init__(self, parameters:dict):
         self.parameters = parameters
-        print(self.parameters)
         self.layers = []
         self.createLayers()
         self.connectLayers()
@@ -58,6 +58,8 @@ class NeuralNetwork:
                 break
             for node in layer:
                 node.setWeights(np.random.uniform(low=-1, high=1, size=len(self.layers[i+1])))
+                node.weightsOld = copy.copy(node.getWeights())
+        
     
     def getLayers(self):
         return self.layers
@@ -68,7 +70,7 @@ class NeuralNetwork:
     def getMomentum(self):
         return float(self.parameters['momentum'])
     
-    def __str__(self)
+    def __str__(self):
         return "Neural Network: \n" + \
             "Parameters: " + str(self.parameters) + "\n" + \
             "Layers: " + str(self.layers) + "\n"

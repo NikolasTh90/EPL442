@@ -80,6 +80,10 @@ class FileReader:
             
             for col, value in enumerate(values):
                 # Assign values to their respective keys
-                data[keys[col]].append(value)
+                try:
+                    data[keys[col]].append(float(value))
+                except:
+                    data[keys[col]].append(value)
+
 
         return data

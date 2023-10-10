@@ -17,10 +17,18 @@ def train(epochs = 1000):
     data = getData()
     neuralNetwork = NeuralNetwork(parameters)
     print(data)
+    for patternNum in range(len(data['testData']['in1'])):
+            print(feedForward(neuralNetwork, data['testData'], patternNum))
     for epoch in range(epochs):
         for patternNum in range(len(data['trainingData']['in1'])):
             feedForward(neuralNetwork, data['trainingData'], patternNum)
             backPropagation(neuralNetwork, data['trainingData'], patternNum)
+            print(neuralNetwork.getLayers()[0][1].getWeights())
+            print(neuralNetwork.getLayers()[0][1].getConnectedToNeurons())
     print("Training complete")
 
-train(1)
+    for patternNum in range(len(data['testData']['in1'])):
+            print(feedForward(neuralNetwork, data['testData'], patternNum))
+    
+train(2)
+

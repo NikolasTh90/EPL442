@@ -69,10 +69,10 @@ class Neuron():
         if self.isBias:
             self.output = 1
         else:
-            inputs = np.array()
+            inputs = np.array([])
             for prev_node in self.connectedFromNeurons:
                 indexOfself = prev_node.connectedToNeurons.index(self)
-                inputs.append(prev_node.getWeights()[indexOfself]*prev_node.getOutput())
+                np.append(inputs, float(prev_node.getWeights()[indexOfself])*float(prev_node.getOutput()))
             
             self.output = sigmoid(inputs.sum())
         
