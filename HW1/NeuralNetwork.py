@@ -74,5 +74,3 @@ class NeuralNetwork:
         return "Neural Network: \n" + \
             "Parameters: " + str(self.parameters) + "\n" + \
             "Layers: " + str(self.layers) + "\n"
-
-    

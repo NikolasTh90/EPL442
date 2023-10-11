@@ -72,7 +72,7 @@ class Neuron():
             inputs = np.array([])
             for prev_node in self.connectedFromNeurons:
                 indexOfself = prev_node.connectedToNeurons.index(self)
-                np.append(inputs, float(prev_node.getWeights()[indexOfself])*float(prev_node.getOutput()))
+                inputs = np.append(inputs, prev_node.getWeights()[indexOfself]*prev_node.getOutput())
             
             self.output = sigmoid(inputs.sum())
         
