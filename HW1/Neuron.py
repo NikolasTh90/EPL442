@@ -7,7 +7,6 @@ class Neuron():
         self.connectedFromNeurons = []
         self.connectedToNeurons = []
         self.output = 1
-        self.error = 0
         self.delta = 0
         self.weights = []
         self.weightsOld = []
@@ -62,7 +61,6 @@ class Neuron():
             "Connected From Neurons: " + str([neuron.id for neuron in self.connectedFromNeurons]) + "\n" + \
             "Connected To Neurons: " + str([neuron.id for neuron in self.connectedToNeurons]) + "\n" + \
             "Output: " + str(self.output) + "\n" + \
-            "Error: " + str(self.error) + "\n" + \
             "Delta: " + str(self.delta) + "\n" + \
             "Weights: " + str(self.weights) + "\n"
 
