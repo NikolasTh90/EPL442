@@ -29,7 +29,7 @@ class NeuralNetwork:
             self.layers.append(hiddenLayerOne)
 
         # Create the second hidden layer
-        if self.parameters['numHiddenLayerTwoNeurons']:
+        if self.parameters['numHiddenLayerTwoNeurons'] > 0:
             hiddenLayerTwo = [Neuron(isBias=True)]
             for i in range(int(self.parameters["numHiddenLayerTwoNeurons"])):
                 hiddenLayerTwo.append(Neuron())
@@ -48,16 +48,17 @@ class NeuralNetwork:
             if i == len(self.layers) - 1:
                 break
             for node in layer:
-                node.setConnectedToNeurons([next_layer_node for next_layer_node in self.layers[i+1]])
-            for next_node in node.getConnectedToNeurons():
-                next_node.addConnectedFromNeuron(node)
+                node.setConnectedToNeurons([next_layer_node  for next_layer_node in self.layers[i+1] if not next_layer_node.isBias ])
+                for next_node in node.getConnectedToNeurons():
+                    if not next_node.isBias:
+                        next_node.addConnectedFromNeuron(node)
 
     def initializeWeights(self):
         for i, layer in enumerate(self.layers):
             if i == len(self.layers) - 1:
                 break
             for node in layer:
-                node.setWeights(np.random.uniform(low=-1, high=1, size=len(self.layers[i+1])))
+                node.setWeights(np.random.uniform(low=-1, high=1, size=len(node.getConnectedToNeurons())))
                 node.weightsOld = copy.copy(node.getWeights())
         
     
@@ -70,7 +71,18 @@ class NeuralNetwork:
     def getMomentum(self):
         return float(self.parameters['momentum'])
     
+    
+
     def __str__(self):
+        nodes = ""
+        for i, layer in enumerate(self.layers):
+            nodes += f"\n -- {i} --\n "
+            for node in layer:
+                nodes += f"\n {node}\n"
+
+            
+            
         return "Neural Network: \n" + \
             "Parameters: " + str(self.parameters) + "\n" + \
-            "Layers: " + str(self.layers) + "\n"
+            "Layers: " + "\n" + nodes
+            

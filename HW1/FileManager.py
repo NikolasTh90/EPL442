@@ -1,25 +1,25 @@
-import pandas as pd
+# import pandas as pd
 
-class PandasFileReader:
-    def __init__(self, filename):
-        self.filename = filename
-        self.df = pd.read_csv(self.filename, sep=' ')
+# class PandasFileReader:
+#     def __init__(self, filename):
+#         self.filename = filename
+#         self.df = pd.read_csv(self.filename, sep=' ')
 
-    def get_parameters(self):
-        parameters = self.df.set_index(0).squeeze().to_dict()
-        for key in parameters.keys():
-            try:
-                parameters[key] = int(parameters[key])
-            except:
-                try:
-                    parameters[key] = float(parameters[key])
-                except:
-                    pass
-        return parameters
+#     def get_parameters(self):
+#         parameters = self.df.set_index(0).squeeze().to_dict()
+#         for key in parameters.keys():
+#             try:
+#                 parameters[key] = int(parameters[key])
+#             except:
+#                 try:
+#                     parameters[key] = float(parameters[key])
+#                 except:
+#                     pass
+#         return parameters
 
-    def get_data(self):
-        data = self.df.drop(0).set_index(self.df.columns[0]).T.to_dict('list')
-        return data
+#     def get_data(self):
+#         data = self.df.drop(0).set_index(self.df.columns[0]).T.to_dict('list')
+#         return data
 
 
 class FileReader:
@@ -87,3 +87,22 @@ class FileReader:
 
 
         return data
+    
+class FileWriter():
+    def __init__(self, filename):
+        self.filename = filename
+    
+    def write(self, labels, data):
+        with open(self.filename, 'w+') as f:
+            for label in labels:
+                f.write(label + ' ')
+            f.write('\n')
+            
+            for record in data:
+                for entry in record:
+                    f.write(str(entry) + ' ')
+                f.write('\n')
+            f.close()
+            
+                
+

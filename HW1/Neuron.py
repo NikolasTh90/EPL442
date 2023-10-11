@@ -57,6 +57,8 @@ class Neuron():
     
     def __str__(self):
         return "Neuron: " + str(self.id) + "\n" + \
+            "is Output: " + str(self.isOutput) + "\n" + \
+            "is Bias: " + str(self.isBias) + "\n" + \
             "Connected From Neurons: " + str([neuron.id for neuron in self.connectedFromNeurons]) + "\n" + \
             "Connected To Neurons: " + str([neuron.id for neuron in self.connectedToNeurons]) + "\n" + \
             "Output: " + str(self.output) + "\n" + \
@@ -70,6 +72,7 @@ class Neuron():
             self.output = 1
         else:
             inputs = np.array([])
+            # print(f"{self}")
             for prev_node in self.connectedFromNeurons:
                 indexOfself = prev_node.connectedToNeurons.index(self)
                 inputs = np.append(inputs, prev_node.getWeights()[indexOfself]*prev_node.getOutput())
@@ -79,16 +82,17 @@ class Neuron():
         return self.output
 
     def calculateDelta(self, targetOutput = None):
-        if self.isOutput:
-            self.delta = self.output * (1 - self.output) * (self.output - targetOutput)
-        else:
-            self.delta = self.output * (1 - self.output) * sum([next_node.getDelta() * self.weights[i] for i, next_node in enumerate(self.connectedToNeurons)])
+        if not self.isBias:
+            if self.isOutput:
+                self.delta = self.output * (1 - self.output) * (self.output - targetOutput)
+            else:
+                self.delta = self.output * (1 - self.output) * sum([next_node.getDelta() * self.weights[i] for i, next_node in enumerate(self.connectedToNeurons)])
 
         return self.delta
 
     def updateWeights(self, learningRate, momentum):
         for i, weight in enumerate(self.weights):
-            weight = weight - learningRate * self.delta * self.output + momentum * (self.weights[i] - self.weightsOld[i])
+            weight = weight - learningRate * self.connectedToNeurons[i].delta * self.output + momentum * (weight - self.weightsOld[i])
             self.weightsOld[i] = self.weights[i]
             self.weights[i] = weight
 
