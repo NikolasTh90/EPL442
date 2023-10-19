@@ -107,7 +107,7 @@ def train(filename='all_data.txt', epochs=None):
             trainingError.append(errors)
             trainingSuccess.append(successes)
             afterTrainingAccuracy = time.time()
-            print(f'Training accuracy calculated in {afterTrainingAccuracy-beforeTrainingAccuracy} seconds')
+            print(f'Training accuracy calculated in {afterTrainingAccuracy-beforeTrainingAccuracy} seconds, error: {errors}, success: {successes} ')
 
             beforeTestAccuracy = time.time()
             # Test accuracy
@@ -129,7 +129,7 @@ def train(filename='all_data.txt', epochs=None):
             testError.append(errors)
             testSuccess.append(successes)
             afterTestAccuracy = time.time()
-            print(f'Test accuracy calculated in {afterTestAccuracy-beforeTestAccuracy} seconds')
+            print(f'Test accuracy calculated in {afterTestAccuracy-beforeTestAccuracy} seconds , error: {errors}, success: {successes} ')
     except KeyboardInterrupt:
         print("Training interrupted")
 
@@ -165,5 +165,5 @@ def train(filename='all_data.txt', epochs=None):
 
     
 np.random.seed(2)    
-train(epochs=5)
+train()
 
