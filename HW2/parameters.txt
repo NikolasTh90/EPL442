@@ -1,9 +1,9 @@
-numHiddenLayerOneNeurons 3
-numHiddenLayerTwoNeurons 0
-numInputNeurons 2
-numOutputNeurons 1
-learningRate 0.5
-momentum 0.5
-maxIterations 800
+numHiddenLayerOneNeurons 16
+numHiddenLayerTwoNeurons 16
+numInputNeurons 16
+numOutputNeurons 26
+learningRate 0.8
+momentum 0.3
+maxIterations 20
 trainFile training.txt
 testFile test.txt

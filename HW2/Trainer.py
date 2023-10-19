@@ -5,19 +5,64 @@ from BackPropagation import backPropagation
 import math
 from matplotlib import pyplot as plt
 import numpy as np
-def getData():
-    trainingData = FileReader('training.txt').getData()
-    testData = FileReader('test.txt').getData()
-    return {"trainingData": trainingData,
-             "testData": testData}
+from utility import TARGET_OUTPUTS, prepare_data
+import time
+import multiprocessing
+import copy
 
-def getParameters():
+def getParameters(filename='parameters.txt'):
     parameters = FileReader('parameters.txt').getParameters()
     return parameters
 
-def train(epochs=None):
+# Define a function to calculate pattern error
+def calculate_pattern_error(actual_output, target_output):
+    pattern_error = sum(0.5 * (target - actual) ** 2 for actual, target in zip(actual_output, target_output))
+    return pattern_error
+
+# Modify the function to calculate training accuracy
+def calculate_accuracy(neural_network, data, pattern_num):
+    actual_output = feedForward(neural_network, data, pattern_num)
+    target_output = [1 if TARGET_OUTPUTS.index(data[pattern_num]['out']) == i else 0 for i in range(len(TARGET_OUTPUTS))]
+    
+    if TARGET_OUTPUTS[actual_output.index(max(actual_output))] == data[pattern_num]['out']:
+        success = 1
+    else:
+        success = 0
+    
+    pattern_error = calculate_pattern_error(actual_output, target_output)
+    return pattern_error, success
+
+
+# Define a function to process a pattern and calculate accuracy
+def process_pattern_wrapper(args):
+    pattern_num, neural_network, data = args
+    return calculate_accuracy(copy.deepcopy(neural_network), data, pattern_num)
+
+# Define a function to calculate training accuracy in parallel
+def calculate_accuracy_parallel(neural_network, data):
+    errors = []
+    successes = []
+
+    with multiprocessing.Pool() as pool:
+        # Use process_pattern_wrapper to pass arguments
+        results = pool.map(process_pattern_wrapper, [(pattern_num, neural_network, data) for pattern_num in range(len(data))])
+
+    # Extract errors and successes from the results
+    for pattern_error, success in results:
+        errors.append(pattern_error / 26)
+        successes.append(success)
+
+    # Calculate overall training error and success rate
+    total_error = sum(errors) / len(data)
+    total_success_rate = (sum(successes) / len(data)) * 100
+
+    return total_error, total_success_rate
+
+def train(filename='all_data.txt', epochs=None):
     parameters = getParameters()
-    data = getData()
+    data = prepare_data(filename)
+    print('Training Data Length:', len(data['trainingData']))
+    print('Test Data Length:', len(data['testData']))
     neuralNetwork = NeuralNetwork(parameters)
     if not epochs:
         epochs = parameters['maxIterations']
@@ -25,32 +70,69 @@ def train(epochs=None):
     trainingSuccess = list()
     testError = list()
     testSuccess = list()
-    for epoch in range(epochs):
-        for patternNum in range(len(data['trainingData']['out'])):
-            feedForward(neuralNetwork, data['trainingData'], patternNum)
-            backPropagation(neuralNetwork, data['trainingData'], patternNum)
-        
-    # Training accuracy
-        error = 0
-        success = 0
-        for patternNum in range(len(data['trainingData']['in1'])):
-            if TARGET_OUPUTS[max(feedForward(neuralNetwork, data['trainingData'], patternNum))] == data['trainingData']['out'][patternNum]:
-                success = success + 1
-            tempError = 0.5 * math.pow(( data['trainingData']['out'][patternNum] - feedForward(neuralNetwork, data['trainingData'], patternNum)), 2)
-            error = error + tempError
-        trainingError.append(error)
-        trainingSuccess.append( 100 * success / float(len(data['trainingData']['out'])))
+    try:
+        for epoch in range(epochs):
+            beforeEpoch = time.time()
 
-        # Test accuracy
-        error = 0
-        success = 0
-        for patternNum in range(len(data['testData']['out'])):
-            if math.fabs(feedForward(neuralNetwork, data['testData'], patternNum) - data['testData']['out'][patternNum]) <= successThreshold:
-                success = success + 1
-            tempError = 0.5 * math.pow(( data['testData']['out'][patternNum] - feedForward(neuralNetwork, data['testData'], patternNum)), 2)
-            error = error + tempError
-        testError.append(error)
-        testSuccess.append(100 * success / float(len(data['testData']['out']))  )
+            for patternNum in range(len(data['trainingData'])): # changed after reorganizing data
+                # before = time.time()
+                feedForward(neuralNetwork, data['trainingData'], patternNum)
+                # after = time.time()
+                # print(f'Feedforward {patternNum} completed in {after-before} seconds')
+                # before = time.time()
+                backPropagation(neuralNetwork, data['trainingData'], patternNum)
+                # after = time.time()
+                # print(f'Backpropagation {patternNum} completed in {after-before} seconds')
+            afterEpoch = time.time()
+            print(f'Epoch {epoch+1} completed in {afterEpoch-beforeEpoch} seconds')
+    
+            beforeTrainingAccuracy = time.time()
+            # Training accuracy
+            # error = 0
+            # success = 0
+            # for patternNum in range(len(data['trainingData'])): # changed after reorganizing data
+            #     actualOutput = feedForward(neuralNetwork, data['trainingData'], patternNum)
+            #     if TARGET_OUTPUTS[actualOutput.index(max(actualOutput))] == data['trainingData'][patternNum]['out']:
+            #         success = success + 1
+            #     outputs = [1 if TARGET_OUTPUTS.index(data['trainingData'][patternNum]['out']) == i else 0 for i in range(len(TARGET_OUTPUTS))] 
+            #     patternError = 0
+            #     for i, output in enumerate(outputs):
+            #         tempError = 0.5 * math.pow(( output - actualOutput[i]), 2)
+            #         patternError = patternError + tempError
+            #     error = error + (patternError/len(actualOutput))
+            # trainingError.append(error/len(data['trainingData']))
+            # trainingSuccess.append( 100 * success / float(len(data['trainingData'])))
+
+            errors, successes = calculate_accuracy_parallel(neuralNetwork, data['trainingData'])
+            trainingError.append(errors)
+            trainingSuccess.append(successes)
+            afterTrainingAccuracy = time.time()
+            print(f'Training accuracy calculated in {afterTrainingAccuracy-beforeTrainingAccuracy} seconds')
+
+            beforeTestAccuracy = time.time()
+            # Test accuracy
+            # error = 0
+            # success = 0
+            # for patternNum in range(len(data['testData'])): # changed after reorganizing data
+            #     actualOutput = feedForward(neuralNetwork, data['testData'], patternNum)
+            #     if TARGET_OUTPUTS[actualOutput.index(max(actualOutput))] == data['testData'][patternNum]['out']:
+            #         success = success + 1
+            #     outputs = [1 if TARGET_OUTPUTS.index(data['testData'][patternNum]['out']) == i else 0 for i in range(len(TARGET_OUTPUTS))] 
+            #     patternError = 0
+            #     for i, output in enumerate(outputs):
+            #         tempError = 0.5 * math.pow(( output - actualOutput[i]), 2)
+            #         patternError = patternError + tempError
+            #     error = error + (patternError/len(actualOutput))
+            # testError.append(error/len(data['testData']))
+            # testSuccess.append( 100 * success / float(len(data['testData'])))
+            errors, successes = calculate_accuracy_parallel(neuralNetwork, data['testData'])
+            testError.append(errors)
+            testSuccess.append(successes)
+            afterTestAccuracy = time.time()
+            print(f'Test accuracy calculated in {afterTestAccuracy-beforeTestAccuracy} seconds')
+    except KeyboardInterrupt:
+        print("Training interrupted")
+
     
 
 
@@ -83,5 +165,5 @@ def train(epochs=None):
 
     
 np.random.seed(2)    
-train()
+train(epochs=5)
 

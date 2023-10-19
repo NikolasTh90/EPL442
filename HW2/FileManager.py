@@ -136,7 +136,9 @@ class Normalizer():
             self.max[key] = max(self.data[key])
             self.min[key] = min(self.data[key])
             for value in self.data[key]:
-                self.normalizedData[key].append((value - self.min[key]) / (self.max[key] - self.min[key]))
+                result = (value - self.min[key]) / (self.max[key] - self.min[key])
+                # rounded_result = round(result, 2)
+                self.normalizedData[key].append(result)
 
     def __init__(self, data):
         self.data = data
