@@ -145,9 +145,9 @@ def train(filename='all_data.txt', epochs=None):
     print("Training complete")
 
 
-    error_log_file = FileWriter('errors.txt')
+    error_log_file = FileWriter(f"error  (LR={neuralNetwork.getLearningRate()}, M={neuralNetwork.getMomentum()}, L1={parameters['numHiddenLayerOneNeurons']}, L2={parameters['numHiddenLayerTwoNeurons']}).txt")
     error_log_file.write(['epoch', 'trainingError', 'testError'], zip(range(1, epochs + 1), trainingError , testError))
-    success_log_file = FileWriter('success.txt')
+    success_log_file = FileWriter(f"success  (LR={neuralNetwork.getLearningRate()}, M={neuralNetwork.getMomentum()}, L1={parameters['numHiddenLayerOneNeurons']}, L2={parameters['numHiddenLayerTwoNeurons']}).txt")
     success_log_file.write(['epoch', 'trainingSuccess', 'testSuccess'], zip(range(1, epochs + 1), trainingSuccess, testSuccess))
    
 
