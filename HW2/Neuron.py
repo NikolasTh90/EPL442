@@ -119,14 +119,26 @@ class Neuron():
     #         # Wait for all tasks to complete
     #         concurrent.futures.wait(futures)
 
+    # def updateWeights(self, learningRate, momentum):
+    #     for i, weight in enumerate(self.weights):
+    #         weight = weight - learningRate * self.connectedToNeurons[i].delta * self.output + momentum * (weight - self.weightsOld[i])
+    #         self.weightsOld[i] = self.weights[i]
+    #         self.weights[i] = weight
+
     def updateWeights(self, learningRate, momentum):
-        for i, weight in enumerate(self.weights):
-            weight = weight - learningRate * self.connectedToNeurons[i].delta * self.output + momentum * (weight - self.weightsOld[i])
-            self.weightsOld[i] = self.weights[i]
-            self.weights[i] = weight
+        weights = np.array(self.weights)
+        weights_old = np.array(self.weightsOld)
+        deltas = np.array([neuron.delta for neuron in self.connectedToNeurons])
+        outputs = np.array(self.output)
 
+        # Calculate weight updates
+        weight_updates = learningRate * deltas * outputs + momentum * (weights - weights_old)
 
-        
+        # Update weights and weightsOld
+        self.weights = weights - weight_updates
+        self.weightsOld = weights
+
+            
 
 
         

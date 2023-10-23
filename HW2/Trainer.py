@@ -9,7 +9,9 @@ from utility import TARGET_OUTPUTS, prepare_data
 import time
 import multiprocessing
 import copy
-
+import os
+max_workers=multiprocessing.cpu_count()
+print(max_workers)
 def getParameters(filename='parameters.txt'):
     parameters = FileReader('parameters.txt').getParameters()
     return parameters
@@ -36,16 +38,20 @@ def calculate_accuracy(neural_network, data, pattern_num):
 # Define a function to process a pattern and calculate accuracy
 def process_pattern_wrapper(args):
     pattern_num, neural_network, data = args
-    return calculate_accuracy(copy.deepcopy(neural_network), data, pattern_num)
+    # print(f'Process {multiprocessing.current_process().pid} processing pattern {pattern_num}')
+    return calculate_accuracy(neural_network[int(multiprocessing.current_process().pid)%max_workers], data, pattern_num)
 
 # Define a function to calculate training accuracy in parallel
 def calculate_accuracy_parallel(neural_network, data):
     errors = []
     successes = []
 
-    with multiprocessing.Pool() as pool:
-        # Use process_pattern_wrapper to pass arguments
-        results = pool.map(process_pattern_wrapper, [(pattern_num, neural_network, data) for pattern_num in range(len(data))])
+    with multiprocessing.Pool(processes=max_workers) as pool:
+        # Create a list of deep copies of the neural network
+        neural_network_copies = [copy.deepcopy(neural_network) for _ in range(max_workers)]
+        
+        # Use process_pattern_wrapper to pass arguments, assigning each worker its copy
+        results = pool.map(process_pattern_wrapper, [(pattern_num, neural_network_copies, data) for i, pattern_num in enumerate(range(len(data)))])
 
     # Extract errors and successes from the results
     for pattern_error, success in results:
@@ -164,6 +170,6 @@ def train(filename='all_data.txt', epochs=None):
     plt.show()
 
     
-np.random.seed(2)    
+np.random.seed(3)    
 train()
 
