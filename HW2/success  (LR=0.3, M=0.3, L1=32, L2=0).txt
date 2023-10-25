@@ -1,2 +1,1 @@
 epoch trainingSuccess testSuccess 
-1 33.928214690017974 33.21292394140076 
