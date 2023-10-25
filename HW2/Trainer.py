@@ -170,6 +170,6 @@ def train(filename='all_data.txt', epochs=None):
     plt.show()
 
     
-np.random.seed(3)    
+np.random.seed(4)    
 train()
 

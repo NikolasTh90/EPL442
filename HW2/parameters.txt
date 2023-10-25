@@ -1,5 +1,5 @@
 numHiddenLayerOneNeurons 32
-numHiddenLayerTwoNeurons 0
+numHiddenLayerTwoNeurons 32
 numInputNeurons 16
 numOutputNeurons 26
 learningRate 0.3
