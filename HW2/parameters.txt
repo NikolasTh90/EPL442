@@ -1,4 +1,4 @@
-numHiddenLayerOneNeurons 2
+numHiddenLayerOneNeurons 32
 numHiddenLayerTwoNeurons 0
 numInputNeurons 16
 numOutputNeurons 26
