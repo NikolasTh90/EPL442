@@ -87,43 +87,6 @@ class Neuron():
 
         return self.delta
     
-    # def update_weights_batch(self, batch_indices, learning_rate, momentum):
-    #     for i in batch_indices:
-    #         weight = self.weights[i]
-    #         delta = self.connectedToNeurons[i].delta
-    #         output = self.output
-
-    #         new_weight = weight - learning_rate * delta * output + momentum * (weight - self.weightsOld[i])
-    #         self.weightsOld[i] = self.weights[i]
-    #         self.weights[i] = new_weight
-
-    # def updateWeights(self, learningRate, momentum):
-    #     batch_size = 16  # Batch size for updating weights
-    #     num_batches = len(self.weights) // batch_size
-
-
-    #     with concurrent.futures.ProcessPoolExecutor() as executor:
-    #         futures = []
-
-    #         for i in range(num_batches):
-    #             # Compute the indices for the current batch
-    #             batch_indices = range(i * batch_size, (i + 1) * batch_size)
-
-    #             # Update weights in parallel for the current batch
-    #             future = executor.submit(self.update_weights_batch, batch_indices, learningRate, momentum)
-    #             futures.append(future)
-    #         # Handle any remaining weights after the last complete batch
-    #         remaining_indices = range(num_batches * batch_size, len(self.weights))
-    #         if remaining_indices:
-    #             self.update_weights_batch(remaining_indices, learningRate, momentum)
-    #         # Wait for all tasks to complete
-    #         concurrent.futures.wait(futures)
-
-    # def updateWeights(self, learningRate, momentum):
-    #     for i, weight in enumerate(self.weights):
-    #         weight = weight - learningRate * self.connectedToNeurons[i].delta * self.output + momentum * (weight - self.weightsOld[i])
-    #         self.weightsOld[i] = self.weights[i]
-    #         self.weights[i] = weight
 
     def updateWeights(self, learningRate, momentum):
         weights = np.array(self.weights)
