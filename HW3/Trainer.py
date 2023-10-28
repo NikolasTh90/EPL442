@@ -22,18 +22,19 @@ def calculate_error(data, som):
     for i in range(len(data)):
         som.setInputs(data[i])
         bmu = som.findBMU()
-        error += sqrt(sum((data[i][f'in{k}'] - som.inputNeurons[k - 1].getWeights()[bmu[0]][bmu[1]]) ** 2 for k in range(1, 17)))
+        error += sum((data[i][f'in{k}'] - som.inputNeurons[k - 1].getWeights()[bmu[0]][bmu[1]]) ** 2 for k in range(1, 17))
     error /= len(data)
-
+    
     return error
 
 def train(filename='all_data.txt', epochs=None):
     parameters = getParameters()
     data = prepare_data(filename)
     print('Training Data Length:', len(data['trainingData']))
-
-    SOM = load_som_model('som_np_paxas.pkl')
-    # SOM = SOMNeuralNetwork(parameters)
+    try:
+        SOM = load_som_model(f"som_LR={parameters['learningRate']}_GS={parameters['gridSize']}_EP={parameters['numEpochs']}.pkl")
+    except:
+        SOM = SOMNeuralNetwork(parameters)
 
     SOM.currentEpoch = SOM.currentEpoch
     try:
@@ -44,9 +45,9 @@ def train(filename='all_data.txt', epochs=None):
                 print(f"Progress: {SOM.currentPattern}/{len(data['trainingData'])}", end="\r")
                 SOM.setInputs(data["trainingData"][SOM.currentPattern])
                 bmu = SOM.findBMU()
-                SOM.updateLearningRate(SOM.currentEpoch)
-                SOM.updateGaussianRadius(SOM.currentEpoch)
-                SOM.updateWeights(bmu, SOM.currentEpoch)
+                SOM.updateLearningRate()
+                SOM.updateGaussianRadius()
+                SOM.updateWeights(bmu)
                 SOM.currentPattern += 1
             end_time = time.time()
             print(f'Epoch {SOM.currentEpoch + 1} completed in {end_time - start_time} seconds')
@@ -70,11 +71,15 @@ def train(filename='all_data.txt', epochs=None):
         print("Training interrupted")
     
     print("Training complete")
-    SOM.save("som_np_paxas.pkl")
+    SOM.save(f"som_LR={SOM.parameters['learningRate']}_GS={SOM.parameters['gridSize']}_EP={parameters['numEpochs']}.pkl")
     SOM.plotTrainingError()
     SOM.plotTestingError()
-    SOM.visualize_map(data['trainingData'])
+    if not SOM.letterMap:
+        SOM.mapLetters(data['testData'])
+        SOM.save(f"som_LR={SOM.parameters['learningRate']}_GS={SOM.parameters['gridSize']}_EP={parameters['numEpochs']}.pkl")
+
+    SOM.visualize_map()
     
-np.random.seed(4)    
+np.random.seed(2)    
 train()
 

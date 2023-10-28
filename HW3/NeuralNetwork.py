@@ -11,6 +11,7 @@ class SOMNeuralNetwork:
         self.gridSize = int(parameters['gridSize'])
         self.numEpochs = int(parameters['numEpochs'])
         self.learningRate = parameters["learningRate"]
+        self.startLearningRate = parameters["learningRate"]
         self.numInputNeurons = int(parameters['numInputNeurons'])
         self.gaussianRadius = parameters["gridSize"]/2.0
         self.currentPattern = 0
@@ -18,6 +19,7 @@ class SOMNeuralNetwork:
         self.inputNeurons = self.createInputNeurons()
         self.TrainingError = []
         self.TestingError = []
+        self.letterMap = None
         self.initializeWeights()
 
     def appendTrainingError(self, trainingError):
@@ -57,10 +59,14 @@ class SOMNeuralNetwork:
 
     #     return np.unravel_index(np.argmin(distances), distances.shape)
     
-    def updateLearningRate(self, epoch):
-        self.learningRate = self.learningRate * np.exp(-epoch / self.numEpochs)
+    def updateLearningRate(self, epoch=None):
+        if not epoch:
+            epoch = self.currentEpoch
+        self.learningRate = self.startLearningRate * np.exp(-epoch / self.numEpochs)
     
-    def updateGaussianRadius(self, epoch):
+    def updateGaussianRadius(self, epoch=None):
+        if not epoch:
+            epoch=self.currentEpoch
         self.gaussianRadius = self.parameters["gridSize"]/2.0 * np.exp(-epoch / self.numEpochs)
     
     # def updateWeights(self, bmu, epoch):
@@ -73,7 +79,7 @@ class SOMNeuralNetwork:
     #                     inputNeuron.setWeight(i, j, inputNeuron.getWeights()[i][j] + self.learningRate * influence * (inputNeuron.getOutput() - inputNeuron.getWeights()[i][j]))
 
 
-    def updateWeights(self, bmu, epoch):
+    def updateWeights(self, bmu):
         for inputNeuron in self.inputNeurons:
             i, j = np.meshgrid(range(self.gridSize), range(self.gridSize), indexing='ij')
             distance = np.sqrt((bmu[0] - i) ** 2 + (bmu[1] - j) ** 2)
@@ -83,12 +89,10 @@ class SOMNeuralNetwork:
             inputNeuron.setWeights(inputNeuron.getWeights() + mask * delta_weights)
 
 
-
-    # visualize the som map
-    def visualize_map(self, input_data):
+    def mapLetters(self, input_data):
         before = time.time()
-        # Create a grid to represent the SOM
-        som_grid = np.zeros((self.gridSize, self.gridSize), dtype=object)
+
+        letterMap = np.zeros((self.gridSize, self.gridSize), dtype=object)
 
         # Find the winning neuron for each input and store it in the grid
 
@@ -100,22 +104,28 @@ class SOMNeuralNetwork:
                 minDistance = sys.maxsize
                 distance = 0
 
-                for input in range(len(input_data[:5000])):
+                for input in range(len(input_data)):
                         # print(f"Input ({input})", end="\r")
                         distance = np.sum((input_data[input][f'in{k}'] - self.inputNeurons[k - 1].getWeights()[i][j]) ** 2 for k in range(1, 17))
                         if distance < minDistance:
                             minDistance = distance
                             minDistanceLetter = input_data[input]['out']
 
-                som_grid[i][j] = minDistanceLetter
+                letterMap[i][j] = minDistanceLetter
+        self.letterMap = letterMap
         after = time.time()
         print(f"Time taken: {after - before}")
+
+    # visualize the som map
+    def visualize_map(self):
+        
+        
         # Create a plot to visualize the SOM
         plt.figure(figsize=(self.gridSize, self.gridSize))
         for x in range(self.gridSize):
             for y in range(self.gridSize):
                 try:
-                    plt.text(x+0.2 if x<self.gridSize-1 else x-0.2, y+0.2 if y<self.gridSize-1 else y-0.2, som_grid[x, y] if som_grid[x, y] else ' ', va='center', ha='center')
+                    plt.text(x+0.2 if x<self.gridSize-1 else x-0.2, y+0.2 if y<self.gridSize-1 else y-0.2, self.letterMap[x, y] if self.letterMap[x, y] else ' ', va='center', ha='center')
                 except:
                     plt.text(x+0.2 if x<self.gridSize-1 else x-0.2, y+0.2 if y<self.gridSize-1 else y-0.2, ' ', va='center', ha='center')
 
