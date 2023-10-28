@@ -1,0 +1,7 @@
+gridSize 100
+numInputNeurons 16
+learningRate 0.9
+momentum 0.3
+numEpochs 500
+trainFile training.txt
+testFile test.txt
