@@ -50,14 +50,6 @@ class SOMNeuralNetwork:
         distances = np.sum((input_outputs[:, np.newaxis, np.newaxis] - input_weights) ** 2, axis=0)
         return np.unravel_index(np.argmin(distances), distances.shape)
 
-    # def findBMU(self):
-    #     distances = np.zeros((self.gridSize, self.gridSize))
-    #     for inputNeuron in self.inputNeurons:
-    #         for i in range(self.gridSize):
-    #             for j in range(self.gridSize):
-    #                 distances[i][j] += (inputNeuron.getOutput() - inputNeuron.getWeights()[i][j]) ** 2
-
-    #     return np.unravel_index(np.argmin(distances), distances.shape)
     
     def updateLearningRate(self, epoch=None):
         if not epoch:
@@ -69,15 +61,6 @@ class SOMNeuralNetwork:
             epoch=self.currentEpoch
         self.gaussianRadius = self.parameters["gridSize"]/2.0 * np.exp(-epoch / self.numEpochs)
     
-    # def updateWeights(self, bmu, epoch):
-    #     for inputNeuron in self.inputNeurons:
-    #         for i in range(self.gridSize):
-    #             for j in range(self.gridSize):
-    #                 distance = np.sqrt((bmu[0]-i)**2 + (bmu[1]-j)**2)
-    #                 if distance <= self.gaussianRadius:
-    #                     influence = np.exp(-(distance**2)/(2*(self.gaussianRadius**2)))
-    #                     inputNeuron.setWeight(i, j, inputNeuron.getWeights()[i][j] + self.learningRate * influence * (inputNeuron.getOutput() - inputNeuron.getWeights()[i][j]))
-
 
     def updateWeights(self, bmu):
         for inputNeuron in self.inputNeurons:
@@ -135,7 +118,24 @@ class SOMNeuralNetwork:
         plt.title("SOM Classification of Alphabet Letters")
         plt.show()
 
-    
+    # visualize the som map and print to text file
+    def visualize_to_txt(self, filename='clustering.txt'):
+        # Open the file in write mode
+        with open(filename, 'w') as file:
+            for x in range(self.gridSize):
+                for y in range(self.gridSize):
+                    try:
+                        # Write the cluster labels to the file
+                        file.write(self.letterMap[x, y] if self.letterMap[x, y] else ' ')
+                    except:
+                        # Handle the case when an exception occurs
+                        file.write(' ')
+                    # Add a space or newline to separate values
+                    file.write(' ' if y < self.gridSize - 1 else '\n')
+
+        print(f"Clustering results saved to {filename}")
+
+
     def plotTrainingError(self):
         plt.plot(self.TrainingError)
         plt.title("Training Error")

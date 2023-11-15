@@ -96,16 +96,19 @@ def train(filename='all_data.txt'):
 
     # Save the trained SOM model to a pickle file
     SOM.save(f"som_LR={SOM.parameters['learningRate']}_GS={SOM.parameters['gridSize']}_EP={parameters['numEpochs']}.pkl")
-   
+    error_log_file = FileWriter(f"results_LR={SOM.parameters['learningRate']}_GS={SOM.parameters['gridSize']}_EP={parameters['numEpochs']}.txt")
+    error_log_file.write(['epoch', 'trainingError', 'testError'], zip(range(1, SOM.currentEpoch + 1), SOM.TrainingError , SOM.TestingError))
     # Plot training and testing errors
     SOM.plotTrainingError()
     SOM.plotTestingError()
     
+
     # If letter mapping is not available, map letters and save the SOM model again
     if SOM.letterMap is None:
         SOM.mapLetters(data['testData'])
         SOM.save(f"som_LR={SOM.parameters['learningRate']}_GS={SOM.parameters['gridSize']}_EP={parameters['numEpochs']}.pkl")
 
+    SOM.visualize_to_txt(f"clustering_LR={SOM.parameters['learningRate']}_GS={SOM.parameters['gridSize']}_EP={parameters['numEpochs']}.txt")
     # Visualize the SOM map
     SOM.visualize_map()
 
