@@ -1,0 +1,15 @@
+H N O H H B B V F S F B B N N
+N O O H H B B I B F F S B N N
+O O O H H H B I B F S S M N N
+O O O G G H E B S S P Q Q N N
+O O G G G E E E B B T Q Q O O
+X G G G E E E E B B Q O N N N
+S S S G G G E C E E O O N N N
+B S S G G G C C E Z Z O N N G
+D D E E E E G C Z Z Z Z L L L
+F F F F U U U E E Z S S L L L
+P F F F U U U E S Z S S L L L
+F P T F F U H S S S S D D D L
+F V F V V V N N K S S D D D D
+T V V V V V N N K K S D D D A
+V V V V V V N N K K K R R D A
