@@ -1,0 +1,10 @@
+D D H F F F F P F S
+B H H V V V V S S S
+O O Q V V V U N H H
+O H Q U U U N N H D
+H H H O O O O X H D
+R H O O O O O X H K
+L R Q O O O O H H H
+L G G O O O B B H R
+L G E R H B B B B B
+E E E E R B B B B B
