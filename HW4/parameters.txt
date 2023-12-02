@@ -1,0 +1,4 @@
+gridSize 50
+numInputNeurons 16
+learningRate 0.2
+numEpochs 85
