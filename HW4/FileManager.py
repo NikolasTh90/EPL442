@@ -55,22 +55,25 @@ class FileReader:
 
 
     # read the file paramters of this format and load in a parameters dictionary
-    # numHiddenLayerOneNeurons 2
-    # numHiddenLayerTwoNeurons 0
-    # numInputNeurons 2
-    # numOutputNeurons 1
-    # learningRate 0.3
-    # momentum 0.2
-    # maxIterations 200
-    # trainFile training.txt
-    # testFile test.txt 
+    # numHiddenLayerNeurons 
+    # numInputNeurons 
+    # numOutputNeurons 
+    # learningRates 
+    # sigmas 
+    # maxIterations 
+    # centresFile 
+    # trainFile 
+    # testFile
     def getParameters(self):
         parameters = {}
         for line in self.lines:
             line = line.strip()
             if line:
                 line = line.split()
-                parameters[line[0]] = line[1]
+                if len(line) > 2:
+                    parameters[line[0]] = list(line[1:])
+                else:
+                    parameters[line[0]] = line[1]
         for key in parameters.keys():
             try:
                 parameters[key] = int(parameters[key])
@@ -122,8 +125,22 @@ class FileWriter():
                 for entry in record:
                     f.write(str(entry) + delimiter)
                 f.write('\n')
-            f.close()            
-                
+            f.close()  
+
+    def write_weights(self, rbfLayer, outputLayer, delimiter=','):
+        with open(self.filename, 'w+') as f:
+            # Write headers
+            f.write(f"RBF Neuron ID{delimiter}Output Neuron ID{delimiter}Weight\n")
+
+            # Iterate through each RBF neuron and its connections
+            
+            for outputNeuron in outputLayer:
+                outputNeuronID = outputNeuron.id  # Replace with actual method to get ID
+                for i, rbfNeuron in enumerate(rbfLayer):
+                    rbfNeuronID = rbfNeuron.id  # Replace with actual method to get ID
+                    f.write(f"{rbfNeuronID}{delimiter}{outputNeuronID}{delimiter}{outputNeuron.getWeights()[i]}\n")
+            f.close()
+
 class Normalizer():
 
     def normalize(self):
@@ -176,14 +193,28 @@ class DataHandler:
         df[feature_cols] = scaler.fit_transform(df[feature_cols])
 
         # Splitting the dataset: first 21 entries for training, last 10 for testing
-        train_data = df.iloc[:21, :]
-        test_data = df.iloc[-10:, :]
+        print(len(df)-test_size)
+        train_data = df.iloc[:len(df)-test_size, :]
+        test_data = df.iloc[-test_size:, :]
 
         return train_data, test_data
+    
+    def cluster_data(self, df, n_clusters):
+        # Clustering the data
+        from sklearn.cluster import KMeans
+        # tempdf = df.get_temporary_df()
+        tempdf= df.drop(['Compound', 'Activity'], axis=1)
+        kmeans = KMeans(n_clusters, random_state=0).fit(tempdf)
+        centers = kmeans.cluster_centers_
+        return centers
 
     def save_data(self, data, filename):
         # Saving the data to a file
-        data.to_csv(filename, index=False, header=True)
+        try:
+            data.to_csv(filename, index=False, header=True)
+        except:
+            data = pd.DataFrame(data)
+            data.to_csv(filename, index=False, header=True)
 
 # Usage
 data_handler = DataHandler('selwood.txt')  # Replace with the actual path

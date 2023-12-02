@@ -1,4 +1,10 @@
-gridSize 50
-numInputNeurons 16
-learningRate 0.2
-numEpochs 85
+numHiddenLayerNeurons 10
+numInputNeurons 53
+numOutputNeurons 1
+learningRates 0.1 0.2 0.1
+sigmas 0.1
+maxIterations 50
+centresFile centers.txt
+trainFile training.txt
+testFile test.txt
+dataFile selwood.txt

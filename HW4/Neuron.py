@@ -28,6 +28,10 @@ class Neuron():
     def setConnectedToNeurons(self, neurons:list):
         self.connectedToNeurons = neurons
     
+    # Set the list of neurons from which this neuron receives input
+    def setConnectedFromNeurons(self, neurons:list):
+        self.connectedFromNeurons = neurons
+    
     # Set the output value of the neuron
     def setOutput(self, output):
         self.output = output

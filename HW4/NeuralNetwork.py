@@ -10,13 +10,22 @@ from Neuron import RBFNeuron, Neuron
 import copy
 
 class RBFNeuralNetwork:
-    def __init__(self, numInputNeurons, numRBFNeurons, numOutputNeurons, centers, sigma):
+    def __init__(self, numInputNeurons, numRBFNeurons, numOutputNeurons, centers, sigmas):
         self.numInputNeurons = numInputNeurons
         self.numRBFNeurons = numRBFNeurons
         self.numOutputNeurons = numOutputNeurons
 
         # Create RBF neurons with given centers and sigma
-        self.rbfLayer = [RBFNeuron(center, sigma) for center, sigma in zip(centers, sigma)]
+        if len(centers) <= numRBFNeurons: 
+            self.rbfLayer = [RBFNeuron(center, sigma) for center, sigma in zip(centers, [sigmas for _ in range(len(centers))])]
+            for i in range(len(centers), numRBFNeurons):
+                self.rbfLayer.append(RBFNeuron(np.random.uniform(0, 1, numInputNeurons), sigmas))
+        else:
+            self.rbfLayer = [RBFNeuron(center, sigma) for center, sigma in zip(centers[:numRBFNeurons], [sigmas for _ in range(numRBFNeurons)])]
+
+        # create the rbf neurons with random centers and given sigmas
+        # self.rbfLayer = [RBFNeuron(np.random.uniform(0, 1, numInputNeurons), sigmas) for _ in range(numRBFNeurons)]
+
         self.rbfLayer.append(Neuron(isBias=True))
 
         # Create output neurons
@@ -29,7 +38,7 @@ class RBFNeuralNetwork:
         # Initialize weights for connections between RBF neurons and output neurons
         for outputNeuron in self.outputLayer:
             outputNeuron.setConnectedFromNeurons(self.rbfLayer)
-            outputNeuron.setWeights(np.random.uniform(-1, 1, len(outputNeuron.connectedFromNeurons)))
+            outputNeuron.setWeights(np.random.uniform(0, 1, len(outputNeuron.connectedFromNeurons)))
             outputNeuron.weightsOld = copy.copy(outputNeuron.getWeights())
 
     def forwardPass(self, inputs):
@@ -50,39 +59,38 @@ class RBFNeuralNetwork:
 
         return finalOutputs
 
-    def train(self, trainingInputs, trainingTargets, learningRate, numIterations):
-        for iteration in range(numIterations):
-            totalError = 0
-            for inputVector, target in zip(trainingInputs, trainingTargets):
-                # Forward pass
-                outputs = self.forwardPass(inputVector)
+    def train(self, trainingInputs, trainingTargets, learningRates):
+        centerLR = float(learningRates[0])
+        weightLR = float(learningRates[1])
+        sigmaLR =  float(learningRates[2])
+        for inputVector, target in zip(trainingInputs, trainingTargets):
+            # Forward pass
+            outputs = self.forwardPass(inputVector)
 
-                # Calculate error
-                error = target - outputs
-                totalError += np.sum(error ** 2)
+            # Calculate error
+            error = target - outputs
+            # totalError += np.sum(error ** 2)
+            # Update weights of output neurons
+            self.updateOutputWeights(error, weightLR)
+            # Update RBF neurons (centers and sigmas)
+            self.updateRBFNeurons(inputVector, error, centerLR, sigmaLR)
 
-                # Update RBF neurons (centers and sigmas)
-                self.updateRBFNeurons(inputVector, error, learningRate)
+            
 
-                # Update weights of output neurons
-                self.updateOutputWeights(error, learningRate)
 
-            totalError /= len(trainingInputs)
-            print(f"Iteration {iteration}, Total Error: {totalError}")
-
-    def updateRBFNeurons(self, inputVector, error, learningRate):
+    def updateRBFNeurons(self, inputVector, error, centerLR, sigmaLR):
         for rbfNeuron in self.rbfLayer:
             if not rbfNeuron.isBias:
                 gaussian_output = rbfNeuron.getOutput()
-                for i in range(len(rbfNeuron.center)):
-                    sum_gradient = np.sum(error * (inputVector[i] - rbfNeuron.center[i]) / (rbfNeuron.sigma ** 2))
-                    rbfNeuron.center[i] += learningRate * sum_gradient * gaussian_output
+                # for i in range(len(rbfNeuron.center)):
+                sum_gradient = error * (inputVector - rbfNeuron.center) / (rbfNeuron.sigma ** 2)
+                rbfNeuron.center += centerLR * sum_gradient * gaussian_output
 
                 distance_squared = np.linalg.norm(inputVector - rbfNeuron.center) ** 2
-                sum_gradient = np.sum(error * distance_squared / (rbfNeuron.sigma ** 3))
-                rbfNeuron.sigma += learningRate * sum_gradient * gaussian_output
+                sum_gradient = error * distance_squared / (rbfNeuron.sigma ** 3)
+                rbfNeuron.sigma += sigmaLR * sum_gradient * gaussian_output
 
-    def updateOutputWeights(self, inputVector, error, learningRate):
+    def updateOutputWeights(self, error, learningRate):
         for outputNeuron in self.outputLayer:
             for i, rbfNeuron in enumerate(self.rbfLayer):
                 gaussian_output = rbfNeuron.getOutput() if not rbfNeuron.isBias else 1
