@@ -111,7 +111,7 @@ except FileNotFoundError:
     time.sleep(1)
     if parameters['centresFile']:
         print('Attempting to create it by clustering the data')
-        centers = data_handler.cluster_data(train_data, n_clusters=train_data.shape[0])
+        centers = data_handler.cluster_data(train_data, n_clusters=parameters['numHiddenLayerNeurons'])
         # Saving the data to files
         data_handler.save_data(centers, parameters['centresFile'] if parameters['centresFile'] else 'centers.txt')
         print('File created successfully')
